@@ -1,11 +1,11 @@
 from timeit import repeat
 from tabulate import tabulate
 
+
 setup_logger = """
 import logging
-logging.basicConfig(level=logging.INFO,
-                    filename='./logs/benchmark_log_text.log',
-                    filemode='w')
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('benchmarking')
 """
 
@@ -131,61 +131,71 @@ logger.info('%s' % obj1)
 """
 
 
+def timecall(funccall):
+    return min(repeat(stmt=funccall, setup=setup_logger, number=1000, repeat=5)) / 1000 * 1000000
+
+
 if __name__ == '__main__':
     the_table = [
         [
             '%-format',
-            min(repeat(stmt=modulo_str, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=modulo_str_int, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=modulo_5str_5int, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(modulo_str),
+            timecall(modulo_str_int),
+            timecall(modulo_5str_5int)
         ],
         [
             '%-format, direct call',
-            min(repeat(stmt=modulo_str2, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=modulo_str_int2, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=modulo_5str_5int_2, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(modulo_str2),
+            timecall(modulo_str_int2),
+            timecall(modulo_5str_5int_2)
         ],
         [
             'str.format()',
-            min(repeat(stmt=format_str, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=format_str_int, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=format_5str_5int, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(format_str),
+            timecall(format_str_int),
+            timecall(format_5str_5int)
         ],
         [
             'f-string',
-            min(repeat(stmt=fstr_str, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=fstr_str_int, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=fstr_5str_5int, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(fstr_str),
+            timecall(fstr_str_int),
+            timecall(fstr_5str_5int)
         ],
         [
             'concatenation',
-            min(repeat(stmt=concat_str, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=concat_str_int, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=concat_5str_5int, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(concat_str),
+            timecall(concat_str_int),
+            timecall(concat_5str_5int)
         ],
         [
             'direct log, as variable',
-            min(repeat(stmt=dir_str, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
+            timecall(dir_str),
             '--',
             '--'
         ],
         [
             'direct log, direct insertion',
-            min(repeat(stmt=dir_str2, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
+            timecall(dir_str2),
             '--',
             '--'
         ],
         [
             'direct log, as list ',
             '--',
-            min(repeat(stmt=dir_str_int, setup=setup_logger, number=1000, repeat=5))/1000*1000000,
-            min(repeat(stmt=multiples, setup=setup_logger, number=1000, repeat=5))/1000*1000000
+            timecall(dir_str_int),
+            timecall(multiples)
         ]
     ]
 
     table2 = [
-        ['direct log, obj lump', min(repeat(stmt=dir_as_object_lump, setup=setup_logger, number=1000, repeat=5))/1000*1000000],
-        ['direct log, obj iterated', min(repeat(stmt=dir_as_object_iterated, setup=setup_logger, number=1000, repeat=5))/1000*1000000]
+        [
+            'direct log, obj lump',
+            timecall(dir_as_object_lump)
+        ],
+        [
+            'direct log, obj iterated',
+            timecall(dir_as_object_iterated)
+        ]
     ]
 
     print(
@@ -196,6 +206,15 @@ if __name__ == '__main__':
                 'With 1 String (microsec)',
                 'With String and Integer (microsec)',
                 'With Multiple Inputs (microsec)'
+            ]
+        )
+    )
+    print(
+        tabulate(
+            table2,
+            headers=[
+                'Method',
+                'Time (microsec)'
             ]
         )
     )
