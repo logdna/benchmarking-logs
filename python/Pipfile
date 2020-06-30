@@ -9,6 +9,7 @@ verify_ssl = true
 tabulate = "*"
 structlog = "*"
 python-rapidjson = "*"
+memory-profiler = "*"
 
 [requires]
 python_version = "3.7"
